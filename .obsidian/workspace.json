@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Untitled.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200,
+    "collapsed": true
   },
   "right": {
     "id": "7693de44a757ca78",
@@ -170,20 +171,20 @@
   },
   "active": "a6f6f4a74069d3ea",
   "lastOpenFiles": [
+    "src/main.ts",
+    "src",
+    "headnumview/src/main.ts",
+    "headnumview/src",
+    "headnumview/obsidian.d.ts",
     "headnumview",
     "design.md",
     "Untitled.md",
-    "src/main.ts",
-    "src",
     "package-lock.json",
     "README.md",
     "myplugin/src/types",
     "myplugin/src/main.ts",
     "myplugin/src",
     "myplugin",
-    "myplugin-1/src",
-    "myplugin-1",
-    "styles.css",
     "test.md",
     "obsidian-numbered-titles-plugin/README.md",
     "a/obsidian-numbered-titles-plugin/README.md"
