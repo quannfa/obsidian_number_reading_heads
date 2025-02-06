@@ -51,9 +51,12 @@ class MyPlugin extends obsidian_1.Plugin {
             });
             // 根据标题层级更新后处理器，使用计数器分别处理 h1-h6
             let counters = [0, 0, 0, 0, 0, 0];
-            // 每打开一个文档，计数器清零
-            this.app.workspace.onLayoutReady(() => {
-                counters = [0, 0, 0, 0, 0, 0];
+            // 监测窗口切换
+            this.app.workspace.on("active-leaf-change", () => {
+                const view = this.app.workspace.getActiveViewOfType(obsidian_1.MarkdownView);
+                if (view) {
+                    counters = [0, 0, 0, 0, 0, 0];
+                }
             });
             // 注册后处理器
             this.registerMarkdownPostProcessor((element, context) => {
@@ -70,11 +73,6 @@ class MyPlugin extends obsidian_1.Plugin {
                 });
             });
         });
-    }
-    addNumbering(title, index) {
-        const { numberingFormat, numberingSeparator } = this.settings;
-        const numbering = numberingFormat.split('.').map((_, i) => index + 1).join(numberingSeparator);
-        return `${numbering} ${title}`;
     }
     loadSettings() {
         return __awaiter(this, void 0, void 0, function* () {
