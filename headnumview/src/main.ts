@@ -1,39 +1,61 @@
 import { Plugin } from 'obsidian';
 
 export default class HeadNumViewPlugin extends Plugin {
-    onload() {
-        console.log('HeadNumView Plugin loaded');
-        // 使用滚动事件更新标题编号
-        window.addEventListener('scroll', this.updateHeadings.bind(this));
-        // 初次加载时更新编号
-        this.updateHeadings();
-    }
+  async onload() {
+    console.log("加载 HeadNumView 插件");
+    // 初始化渲染
+    this.renderTitles();
+    // 监听滚动事件，文档更新时重新渲染标题编号
+    this.registerDomEvent(window, 'scroll', this.renderTitles.bind(this));
+  }
 
-    onunload() {
-        console.log('HeadNumView Plugin unloaded');
-        window.removeEventListener('scroll', this.updateHeadings.bind(this));
-    }
+  onunload() {
+    console.log("卸载 HeadNumView 插件");
+  }
 
-    updateHeadings() {
-        const headings: NodeListOf<HTMLElement> = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-        this.addNumbering(headings);
-    }
+  registerDomEvent(target: EventTarget, type: string, callback: EventListener): void {
+    target.addEventListener(type, callback);
+    this.registerEvent({
+      destroy: () => target.removeEventListener(type, callback)
+    });
+  }
 
-    addNumbering(headings: NodeListOf<HTMLElement>) {
-        let counts = [0, 0, 0, 0, 0, 0];
-        headings.forEach((heading) => {
-            const level = parseInt(heading.tagName.substring(1)) - 1;
-            // 重置当前标题层级以下的计数器
-            for (let i = level + 1; i < counts.length; i++) {
-                counts[i] = 0;
-            }
-            counts[level] += 1;
-            // 生成编号字符串，如 1.2.3
-            const numbering = counts.slice(0, level + 1).join(".");
-            // 如果标题尚未编号，则添加编号
-            if (!heading.innerText.trim().match(/^(\d+\.)+/)) {
-                heading.innerText = `${numbering}. ${heading.innerText}`;
-            }
-        });
-    }
+  /**
+   * 从页面中获取所有标题元素（h1 ~ h6）。
+   */
+  getTitles(): HTMLElement[] {
+    const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6')) as HTMLElement[];
+    return headings;
+  }
+
+  /**
+   * 为标题添加编号。
+   * 避免重复编号：使用 data-originalText 保存原始标题内容。
+   */
+  addNumbering(headings: HTMLElement[]): void {
+    // 初始化各级标题计数器
+    const counters = [0, 0, 0, 0, 0, 0];
+    headings.forEach(heading => {
+      const level = parseInt(heading.tagName.substring(1));
+      if (!heading.dataset.originalText) {
+        heading.dataset.originalText = heading.textContent || "";
+      }
+      // 递增当前级别计数器
+      counters[level - 1]++;
+      // 重置所有低级计数器
+      for (let i = level; i < counters.length; i++) {
+        counters[i] = 0;
+      }
+      const numbering = counters.slice(0, level).join('.') + '. ';
+      heading.textContent = numbering + heading.dataset.originalText;
+    });
+  }
+
+  /**
+   * 获取标题并添加编号，完成后渲染到页面中。
+   */
+  renderTitles() {
+    const headings = this.getTitles();
+    this.addNumbering(headings);
+  }
 }
